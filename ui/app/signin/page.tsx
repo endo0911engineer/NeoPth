@@ -6,44 +6,44 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Mail, Lock, User, Eye, EyeOff } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-export default function SignupPage() {
+export default function SigninPage() {
   const [email, setEmail] = useState("")
-  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [message, setMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
-  const handleSignup = async () => {
+  const handleSignin = async () => {
     setIsLoading(true)
     setMessage("")
 
     try {
-      const response = await fetch(`${BASE_URL}/signup`, {
+      const response = await fetch(`${BASE_URL}/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, username, password }),
+        body: JSON.stringify({ email, password }),
       })
 
       const data = await response.json()
 
-      if (response.ok) {
-        setMessage("Signup successful! Redirecting to sign in...")
+      if (response.ok && data.token) {
+        localStorage.setItem("token", data.token)
+        setMessage("Login successful! Redirecting...")
         setTimeout(() => {
-          router.push("/signin")
-        }, 2000)
+          router.push("/dashboard")
+        }, 1500)
       } else {
-        setMessage(data.message || "Signup failed. Please try again.")
+        setMessage(data.message || "Login failed. Please check your credentials.")
       }
     } catch (error) {
-      console.error("Signup error:", error)
+      console.error("Signin error:", error)
       setMessage("An unexpected error occurred. Please try again.")
     } finally {
       setIsLoading(false)
@@ -54,9 +54,9 @@ export default function SignupPage() {
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-gray-900 border-gray-700">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center text-white">Create Account</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-white">Welcome Back</CardTitle>
           <CardDescription className="text-center text-gray-400">
-            Enter your details to create your new account
+            Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -79,27 +79,14 @@ export default function SignupPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-gray-300">
-              Username
-            </Label>
-            <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
-                className="pl-10 bg-gray-800 border-gray-600 text-white placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500"
-                required
-              />
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-gray-300">
+                Password
+              </Label>
+              <button className="text-sm text-blue-400 hover:text-blue-300 hover:underline transition-colors">
+                Forgot password?
+              </button>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-gray-300">
-              Password
-            </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -122,35 +109,41 @@ export default function SignupPage() {
           </div>
 
           <Button
-            onClick={handleSignup}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={handleSignin}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 transition-all duration-200 transform hover:scale-[1.02]"
             disabled={isLoading}
           >
             {isLoading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Creating Account...
-              </>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Signing In...</span>
+              </div>
             ) : (
-              "Create Account"
+              "Sign In"
             )}
           </Button>
 
           {message && (
-            <Alert className="bg-gray-800 border-gray-600">
-              <AlertDescription className="text-gray-300">{message}</AlertDescription>
+            <Alert
+              className={`${
+                message.includes("successful") ? "bg-green-900/50 border-green-600" : "bg-red-900/50 border-red-600"
+              }`}
+            >
+              <AlertDescription className={`${message.includes("successful") ? "text-green-300" : "text-red-300"}`}>
+                {message}
+              </AlertDescription>
             </Alert>
           )}
 
-          <p className="text-center text-sm text-gray-400">
-            Already have an account?{" "}
+          <div className="text-center text-sm text-gray-400">
+            {"Don't have an account? "}
             <button
-              onClick={() => router.push("/signin")}
-              className="text-blue-400 hover:text-blue-300 underline transition-colors"
+              onClick={() => router.push("/signup")}
+              className="text-blue-400 hover:text-blue-300 font-medium hover:underline transition-colors"
             >
-              Sign in
+              Sign up
             </button>
-          </p>
+          </div>
         </CardContent>
       </Card>
     </div>

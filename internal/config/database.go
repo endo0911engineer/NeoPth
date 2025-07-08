@@ -18,7 +18,7 @@ func InitDB() (*sql.DB, error) {
 	once.Do(func() {
 		dbPath := os.Getenv("SQLITE_DB_PATH")
 		if dbPath == "" {
-			dbPath = "./latency_lens.db"
+			dbPath = "./assignment.db"
 		}
 
 		DB, err = sql.Open("sqlite3", dbPath)
@@ -39,23 +39,25 @@ func InitDB() (*sql.DB, error) {
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`
 
-		createFaqTable := `
-		CREATE TABLE IF NOT EXISTS faqs (
-			id TEXT PRIMARY KEY,
+		createJournalTable := `
+		CREATE TABLE IF NOT EXISTS journal_entries (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER NOT NULL,
-			question TEXT NOT NULL,
-			answer TEXT NOT NULL,
+			content TEXT NOT NULL,
+			emotion TEXT,
+			emotion_score INTEGER,
+			advice TEXT,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			FOREIGN KEY (user_id) REFERENCES users(id)
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 		);`
 
 		if _, err = DB.Exec(createUsersTable); err != nil {
 			return
 		}
-		if _, err = DB.Exec(createFaqTable); err != nil {
+		if _, err = DB.Exec(createJournalTable); err != nil {
 			return
 		}
+
 	})
 	return DB, err
 }
