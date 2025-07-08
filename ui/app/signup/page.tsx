@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { signupUser } from "@/service/api"
 
 export default function SignupPage() {
   const [email, setEmail] = useState("")
@@ -17,34 +18,19 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
   const handleSignup = async () => {
     setIsLoading(true)
     setMessage("")
 
     try {
-      const response = await fetch(`${BASE_URL}/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, username, password }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setMessage("Signup successful! Redirecting to sign in...")
-        setTimeout(() => {
-          router.push("/signin")
-        }, 2000)
-      } else {
-        setMessage(data.message || "Signup failed. Please try again.")
-      }
-    } catch (error) {
-      console.error("Signup error:", error)
-      setMessage("An unexpected error occurred. Please try again.")
+      await signupUser(email, username, password)
+      setMessage("Signup successful! Redirecting to sign in...")
+      setTimeout(() => {
+        router.push("/signin")
+      }, 2000)
+    } catch (error: any) {
+      setMessage(error.message || "Unexpected error occurred. Please try again.")
     } finally {
       setIsLoading(false)
     }

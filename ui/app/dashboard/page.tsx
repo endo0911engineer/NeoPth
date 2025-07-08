@@ -9,21 +9,8 @@ import { Progress } from "@/components/ui/progress"
 import { Brain, TrendingUp, Heart, MessageSquare, BarChart3, User, LogOut, Lightbulb, Clock, Save } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { useRouter } from "next/navigation"
-
-interface DiaryEntry {
-  id: string
-  date: string
-  content: string
-  emotion: string
-  advice: string
-  emotionScore: number
-}
-
-interface EmotionData {
-  day: string
-  score: number
-  emotion: string
-}
+import { analyzeJournal, analyzeWeeklyEmotions, fetchDiaryEntries, saveJournal } from "@/service/api"
+import { DiaryEntry, EmotionData } from "@/types/model"
 
 export default function DashboardPage() {
   const [diaryContent, setDiaryContent] = useState("")
@@ -35,8 +22,6 @@ export default function DashboardPage() {
   const [weeklyData, setWeeklyData] = useState<EmotionData[]>([])
   const router = useRouter()
   const [token, setToken] = useState<string | null>(null)
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
-
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token")
@@ -46,23 +31,16 @@ export default function DashboardPage() {
     }
     setToken(storedToken)
 
-    const fetchEntries = async () => {
+    const init = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/journal`, {
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        })
-        if (!res.ok) throw new Error("Failed to fetch entries")
-        const data = await res.json()
-        console.log("Fetched data:", data)
-        setDiaryEntries(data)
-      } catch (error) {
-        console.error("Error fetching entries:", error)
+        const entries = await fetchDiaryEntries(storedToken)
+        setDiaryEntries(entries)
+      } catch (err) {
+        console.error("Error loading entries:", err)
       }
     }
 
-    fetchEntries()
+    init()
   }, [])
 
 
@@ -71,39 +49,22 @@ export default function DashboardPage() {
     setIsSaving(true)
     
     try {
-      const res = await fetch(`${BASE_URL}/journal/analyze`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ content: diaryContent }),
-      })
-      
-      if (!res.ok) throw new Error("Failed to analyze journal")
-
-      const data = await res.json()
-      const { emotion, emotionScore, advice } = data
-
+      const { emotion, emotionScore, advice } = await analyzeJournal(token, diaryContent)
 
       setCurrentEmotion(emotion)
       setCurrentAdvice(advice)
 
-      const saveRes = await fetch(`${BASE_URL}/journal`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+      if (!token) {
+        alert("ログイン情報がありません")
+        return
+      }
+
+      await saveJournal(token, {
           content: diaryContent,
           emotion,
           emotionScore,
           advice,
-        }),
-      })
-
-      if (!saveRes.ok) throw new Error("Failed to save journal")
+        })
 
       const newEntry: DiaryEntry = {
         id: Date.now().toString(),
@@ -113,13 +74,10 @@ export default function DashboardPage() {
         emotionScore,
         advice,
       }
-    
-      setCurrentEmotion(emotion)
-      setCurrentAdvice(advice)
+  
       setDiaryEntries((prev) => [newEntry, ...prev])
       setDiaryContent("")
     } catch (error) {
-      console.error("Error saving journal:", error)
       alert("An error occurred while saving the entry.")
     } finally {
       setIsSaving(false)
@@ -129,25 +87,12 @@ export default function DashboardPage() {
   const handleAnalyzeWeeklyEmotions = async () => {
     if (diaryEntries.length === 0) return
     setIsAnalyzing(true)
-
-    const recentEntries = diaryEntries.slice(0, 7).reverse()
     
     try {
-      const res = await fetch(`${BASE_URL}/journal/weekly-analysis`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ entries: recentEntries }),
-      })
-      
-      if (!res.ok) throw new Error("Failed to analyze weekly emotions")
-
-      const data: EmotionData[] = await res.json()
-      setWeeklyData(data)
-    } catch (error) {
-      console.error("Error analyzing weekly emotions:", error)
+      const recentEntries = diaryEntries.slice(0, 7).reverse()
+      const result = await analyzeWeeklyEmotions(token, recentEntries)
+      setWeeklyData(result)
+    } catch (err) {
       alert("Error analyzing weekly emotions")
     } finally {
       setIsAnalyzing(false)
@@ -178,7 +123,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Brain className="h-8 w-8 text-blue-400" />
-              <h1 className="text-2xl font-bold">MindPath Dashboard</h1>
+              <h1 className="text-2xl font-bold">NeoPath Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-gray-300">

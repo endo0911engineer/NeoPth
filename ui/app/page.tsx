@@ -12,7 +12,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Brain className="h-8 w-8 text-blue-400" />
-              <h1 className="text-2xl font-bold">MindPath</h1>
+              <h1 className="text-2xl font-bold">NeoPath</h1>
             </div>
             <nav className="hidden md:flex items-center space-x-6">
               <Link href="#features" className="text-gray-300 hover:text-white transition-colors">
