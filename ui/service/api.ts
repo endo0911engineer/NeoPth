@@ -69,11 +69,15 @@ export async function saveJournal(token: string | null, entry: Omit<DiaryEntry, 
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(entry),
+    body: JSON.stringify({
+      content: entry.content,
+      emotion: entry.emotion,
+      emotion_score: entry.emotionScore, 
+      advice: entry.advice,
+    }),
   })
 
   if (!res.ok) throw new Error("Failed to save journal")
-  return res.json()
 }
 
 export async function analyzeWeeklyEmotions(token: string | null, entries: DiaryEntry[]): Promise<EmotionData[]> {

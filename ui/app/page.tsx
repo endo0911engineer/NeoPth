@@ -164,9 +164,9 @@ export default function HomePage() {
         <div className="container mx-auto text-center">
           <div className="max-w-3xl mx-auto">
             <BookOpen className="h-16 w-16 text-blue-400 mx-auto mb-6" />
-            <h3 className="text-3xl font-bold mb-6">About MindPath</h3>
+            <h3 className="text-3xl font-bold mb-6">About NeoPath</h3>
             <p className="text-lg text-gray-300 leading-relaxed mb-8">
-              MindPath is an emotion analysis app designed for rehabilitation support. Using the latest AI technology,
+              NeoPath is an emotion analysis app designed for rehabilitation support. Using the latest AI technology,
               it analyzes users' emotional changes and supports positive growth. Privacy is our top priority, providing
               a safe and reliable environment.
             </p>
@@ -184,9 +184,9 @@ export default function HomePage() {
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Brain className="h-6 w-6 text-blue-400" />
-            <span className="text-lg font-semibold">MindPath</span>
+            <span className="text-lg font-semibold">NeoPath</span>
           </div>
-          <p className="text-gray-400 text-sm">© 2024 MindPath. All rights reserved.</p>
+          <p className="text-gray-400 text-sm">© 2025 NeoPath. All rights reserved.</p>
         </div>
       </footer>
     </div>
