@@ -25,4 +25,4 @@ NeoPath は、Next.js × Go を用いて構築された、
 "Lately, I’ve been feeling really down. Even the things I used to enjoy don’t make me happy anymore. I just feel tired and disconnected from everyone."
 
 ## デモ
-[![Demo Video]](https://www.youtube.com/watch?v=aJyJwGtNRt8)
+[![Demo Video](https://img.youtube.com/vi/aJyJwGtNRt8/hqdefault.jpg)](https://www.youtube.com/watch?v=aJyJwGtNRt8)
