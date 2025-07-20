@@ -26,3 +26,37 @@ NeoPath は、Next.js × Go を用いて構築された、
 
 ## デモ
 [![Demo Video](https://img.youtube.com/vi/aJyJwGtNRt8/hqdefault.jpg)](https://www.youtube.com/watch?v=aJyJwGtNRt8)
+
+
+## 環境セットアップ
+``` bash
+git clone https://github.com//endo0911engineer/neo-path
+cd neo-path
+```
+以下のようなenvファイルを作成
+
+ルートディレクトリの.env
+``` bash
+PORT=8080
+JWT_SECRET=your-very-secure-secret
+DATABASE_URL=file:auth.db?cache=shared&mode=rwc
+OPENROUTER_API_KEY=your-api-key
+```
+
+フロントエンド用の.env 
+./ui/.env
+```bash
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+```
+
+Dockerで立ち上げる
+```bash
+docker compose up --build
+```
+ブラウザで以下にアクセスしてください:
+
+フロントエンド: http://localhost:3000
+
+バックエンドAPI: http://localhost:8080
+
+

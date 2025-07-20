@@ -9,19 +9,18 @@ RUN go mod download
 
 COPY . ./
 WORKDIR /app/cmd/server
-RUN go build -o /latency-lens
+RUN go build -o /neo-path
 
 # Run Stage
 FROM gcr.io/distroless/base-debian11
 
 WORKDIR /
 
-COPY --from=builder /latency-lens .
+COPY --from=builder /neo-path .
 COPY --from=builder /app/internal/config/sqlite.db ./sqlite.db
 
 ENV PORT=8080
-ENV JWT_SECRET=${JWT_SECRET}
 
 EXPOSE 8080
 
-CMD ["/latency-lens"]
+CMD ["/neo-path"]
