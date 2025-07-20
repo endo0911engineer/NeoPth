@@ -7,11 +7,11 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="border-b border-gray-800 bg-black/50 backdrop-blur-sm">
+      <header className="h-16 border-b border-gray-800 bg-black/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Brain className="h-8 w-8 text-blue-400" />
+             <Brain className="h-8 w-8 text-blue-400" />
               <h1 className="text-2xl font-bold">NeoPath</h1>
             </div>
             <nav className="hidden md:flex items-center space-x-6">
